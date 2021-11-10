@@ -1,51 +1,53 @@
 
 <?php
-session_start();
-require "php/connectDB.php";
 
+require "PHP/connectDB.php";
 $conn=connectDB();
+if(!empty($_POST["input_valider"])) {
+    echo "<script> console.log('submited')</script>";
 
+    if(!empty($_POST['input_check'])){
+        $arrayIdNotes=$_POST['input_check'];
 
+        if(!empty($_POST['inputNote'])){
+            $arrayNewNotes=$_POST['inputNote'];
 
-if(!empty($_POST["input_login"])) {
+            for($i=0; $i<count($arrayIdNotes);$i++){
 
-    $req = 'SELECT distinct email as email, psswd FROM USER';
-    $arrayCompte = askPrepare_DB($conn, $req, '', '');
-    $isPsswdCorrect=false;
-    $isLoginCorrect=false;
+                $intVarNote=intval($arrayNewNotes[$i]);
+                $intVarId=intval($arrayIdNotes[$i]);
 
-    $loginEntree = $_POST["input_login"];
-    $psswdEntree = $_POST["input_MDP"];
-
-    //on parcourt le tableau , on vérifie si le mail et psswd entrés existent
-    for ($i = 0; $i < count($arrayCompte); $i++) {
-        if ($arrayCompte[$i]['email'] == $loginEntree) {
-            $isLoginCorrect = true;
-            echo "<script> console.log('mail valide') </script>";
-
-            if ($arrayCompte[$i]['psswd'] == $psswdEntree) {
-                $isPsswdCorrect = true;
-                echo "<script> console.log('psswd valide') </script>";
-                break;
+                $req='UPDATE notes
+                              SET notes.valueNote='.$intVarNote.'
+                              WHERE notes.idNote= '.$intVarId.'';
+                sendData_DB($conn,$req,'','');
             }
+
         }
     }
-// REDIRECTION VERS LA PAGE 2 -> si authentification réussie : login et psswd ------------------------------------------------------------------------------------------------
-    if ($isLoginCorrect && $isPsswdCorrect) {
-        // $_SESSION['mailUtilisateur']=$loginEntree;
-        header("Location:page2.php");
-    }
+
 }
+$req='SELECT n.idNote as idNote,c.labelCourse as matiere , n.subjectNote as sujet ,u.lastName as nom , u.firstName as prenom , n.valueNote as note FROM course c, user u, notes n WHERE n.idUser=u.idUser AND c.idCourse=n.idCourse';
+$arrayNotes=askPrepare_DB($conn,$req,'','');
+
+$req='SELECT DISTINCT c.labelCourse as matiere,u.lastName as nom , u.firstName as prenom , AVG(n.valueNote) as moyenneNote
+FROM course c, user u, notes n
+WHERE n.idUser=u.idUser
+AND c.idCourse=n.idCourse
+group by u.lastName, c.labelCourse';
+$arrayMoyenne=askPrepare_DB($conn,$req,'','');
+
+
 ?>
 
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <title>Login Notes</title>
+    <title>TP Notes </title>
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="css/headerFooter.css">
-    <link rel="stylesheet" type="text/css" href="css/login.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
 
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="js/headerFooter.js"></script>
@@ -60,13 +62,65 @@ if(!empty($_POST["input_login"])) {
 include"headerFooter/header.php";
 ?>
 
-<section id="section_Digit" name="section_Digit">
+<section>
 
-    <form method='POST' action='#'>
+    <?php
+        if($arrayNotes) {
+            echo "<form method='POST' action='#'>";
+             echo "<table>";
+              echo "<thead>";
+                    echo"<td>Matière</td>
+                          <td>Sujet</td>
+                          <td>Nom</td>
+                          <td>Prénom</td>
+                          <td>Note</td>
+                          <td>Editer</td>";
+                echo"</thead >";
+               echo"<tbody>";
+                    for($i=0;$i<count($arrayNotes);$i++){
+                        echo "<tr>";
+                            echo "<td>".$arrayNotes[$i]["matiere"]."</td>";
+                            echo "<td>".$arrayNotes[$i]["sujet"]."</td>";
+                            echo "<td>".$arrayNotes[$i]["nom"]."</td>";
+                            echo "<td>".$arrayNotes[$i]["prenom"]."</td>";
+                            echo "<td>".$arrayNotes[$i]["note"]." </br> <input name='inputNote[]' id='input_check".$i." Note' type='number' min='0' max='20' disabled></td>";
+                            echo "<td><input type='checkbox' id='input_check".$i." ' value=".$arrayNotes[$i]['idNote']." name='input_check[]' onchange='editNote(this.id)'></td>";
+                        echo"</tr>";
+                    }
+                echo"</tbody>";
+            echo"</table>";
+            echo" <div id='divFlex_InputSubmit'><input id = input_valider name = 'input_valider' type = 'submit'/> </div>";
+       echo" </form >";
+        }
+        else{
+            echo "<h1><center>Erreur connexion Base De Données </center></h1>";
+        }
+
+        if($arrayMoyenne){
+            echo "<table>";
+                echo"<thead>";
+                     echo"<td>Matière</td>
+                           <td>Nom</td>
+                            <td>Prénom</td>
+                            <td>Moyenne</td>";
+                 echo"</thead>";
+                 echo"<tbody>";
+                        for($i=0;$i<count($arrayMoyenne);$i++) {
+                            echo"<tr>";
+                            echo "<td>" . $arrayMoyenne[$i]["matiere"] . "</td>";
+                            echo "<td>" . $arrayMoyenne[$i]["nom"] . "</td>";
+                            echo "<td>" . $arrayMoyenne[$i]["prenom"] . "</td>";
+                            echo "<td>" . $arrayMoyenne[$i]["moyenneNote"] . "</td>";
+                            echo "</tr>";
+                        }
+                 echo"</tbody>";
+            echo "</table>";
+
+        }
 
 
-        <input id=input_digitValider name='input_digitValider' type='submit'/>
-    </form>
+
+    ?>
 
 
 
