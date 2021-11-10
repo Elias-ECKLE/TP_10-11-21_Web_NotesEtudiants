@@ -19,6 +19,9 @@ tr:nth-child(odd){
 tr:nth-child(even){
     background-color: aqua;
 }
+tr:hover{
+    background-color: cadetblue;
+}
 
 
 #divFlex_InputSubmit{
