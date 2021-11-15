@@ -150,11 +150,13 @@ require "PHP/Classes_Index.php";
     ?>
 
    <article id='articleTabMoy_DOM'>
+       <h2 ><center>Gestion tableau en DOM :</center></h2>
 
             <script>
                 tableMoyennes= new JsTable();
                 tableMoyennes.createTable();
                 tableMoyennes.addTableToDOM('articleTabMoy_DOM');
+                tableMoyennes.table.setAttribute("id","idtableMoyDOM");
             </script>;
             <?php
             addRowToTable(0);
@@ -173,6 +175,19 @@ require "PHP/Classes_Index.php";
                 addDataToTable($i,$j,$arrayMoyenne[$i]["prenom"]);
                 $j++;
                 addDataToTable($i,$j,$arrayMoyenne[$i]["moyenneNote"]);
+
+
+                $str_row='row'.$i;
+                if($arrayMoyenne[$i]["moyenneNote"]>0 && $arrayMoyenne[$i]["moyenneNote"]<=10){
+                    echo "<script>".$str_row.".classList.add('tr_Moy0')</script>";
+                }
+                if($arrayMoyenne[$i]["moyenneNote"]>10&& $arrayMoyenne[$i]["moyenneNote"]<=15){
+
+                    echo "<script>".$str_row.".classList.add('tr_Moy10')</script>";
+                }
+                if($arrayMoyenne[$i]["moyenneNote"]>15 && $arrayMoyenne[$i]["moyenneNote"]<=20){
+                    echo "<script>".$str_row.".classList.add('tr_Moy15')</script>";
+                }
 
             }
 

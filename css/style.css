@@ -24,6 +24,21 @@ tr:hover{
 }
 
 
+#idtableMoyDOM .tr_Moy15{
+    background-color: lightgreen;
+}
+#idtableMoyDOM .tr_Moy10{
+    background-color: palevioletred;
+}
+#idtableMoyDOM .tr_Moy0{
+    background-color: darkred;
+}
+
+#idtableMoyDOM tr:hover{
+    background-color: cadetblue;
+}
+
+
 #divFlex_InputSubmit{
     display: flex;
 }
